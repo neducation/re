@@ -1249,3 +1249,193 @@ document.addEventListener("click", function (e) {
     hapticFeedback("light");
   }
 });
+
+// Login functionality
+function loginUser(username, password) {
+  // Simple login - in production this would be more secure
+  if (username.toLowerCase() === "jackster") {
+    localStorage.setItem(
+      "spa-app-user",
+      JSON.stringify({
+        username: username,
+        isAdmin: username.toLowerCase() === "nathan",
+        loginTime: new Date().toISOString(),
+      })
+    );
+
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app-container").style.display = "block";
+
+    // Show admin panel if user is Nathan
+    if (username.toLowerCase() === "nathan") {
+      document.getElementById("admin-panel").style.display = "block";
+    }
+
+    // Update login streak
+    spaApp.updateLoginStreak();
+    spaApp.updateUI();
+
+    return true;
+  }
+  return false;
+}
+
+function logout() {
+  localStorage.removeItem("spa-app-user");
+  document.getElementById("login-screen").style.display = "flex";
+  document.getElementById("app-container").style.display = "none";
+  document.getElementById("admin-panel").style.display = "none";
+}
+
+// Check if user is logged in on page load
+function checkLoginStatus() {
+  const user = JSON.parse(localStorage.getItem("spa-app-user") || "null");
+  if (user) {
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app-container").style.display = "block";
+
+    if (user.isAdmin) {
+      document.getElementById("admin-panel").style.display = "block";
+    }
+  } else {
+    document.getElementById("login-screen").style.display = "flex";
+    document.getElementById("app-container").style.display = "none";
+  }
+}
+
+// Admin functions
+function forceAppUpdate() {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function (registrations) {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+
+  // Clear all caches
+  if ("caches" in window) {
+    caches
+      .keys()
+      .then(function (cacheNames) {
+        return Promise.all(
+          cacheNames.map(function (cacheName) {
+            return caches.delete(cacheName);
+          })
+        );
+      })
+      .then(function () {
+        alert("App cache cleared! Reloading with fresh version...");
+        window.location.reload(true);
+      });
+  } else {
+    alert("Force reloading app...");
+    window.location.reload(true);
+  }
+}
+
+function exportData() {
+  const allData = {
+    spaData: JSON.parse(localStorage.getItem("spa-app-data") || "{}"),
+    userData: JSON.parse(localStorage.getItem("spa-app-user") || "{}"),
+    exportDate: new Date().toISOString(),
+    version: "2.0",
+  };
+
+  const dataStr = JSON.stringify(allData, null, 2);
+  const dataBlob = new Blob([dataStr], { type: "application/json" });
+
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(dataBlob);
+  link.download = `spa-app-backup-${
+    new Date().toISOString().split("T")[0]
+  }.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  alert("Data exported successfully!");
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const importedData = JSON.parse(e.target.result);
+
+      if (confirm("This will replace all current data. Are you sure?")) {
+        if (importedData.spaData) {
+          localStorage.setItem(
+            "spa-app-data",
+            JSON.stringify(importedData.spaData)
+          );
+        }
+        if (importedData.userData) {
+          localStorage.setItem(
+            "spa-app-user",
+            JSON.stringify(importedData.userData)
+          );
+        }
+
+        alert("Data imported successfully! Reloading app...");
+        window.location.reload();
+      }
+    } catch (error) {
+      alert("Error importing data: Invalid file format");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function clearCacheAndReset() {
+  if (confirm("This will clear all app data and cache. Are you sure?")) {
+    // Clear localStorage
+    localStorage.removeItem("spa-app-data");
+    localStorage.removeItem("spa-app-user");
+
+    // Clear service worker and caches
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (registrations) {
+        for (let registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
+
+    if ("caches" in window) {
+      caches
+        .keys()
+        .then(function (cacheNames) {
+          return Promise.all(
+            cacheNames.map(function (cacheName) {
+              return caches.delete(cacheName);
+            })
+          );
+        })
+        .then(function () {
+          alert("All data and cache cleared! Reloading app...");
+          window.location.reload(true);
+        });
+    } else {
+      alert("All data cleared! Reloading app...");
+      window.location.reload(true);
+    }
+  }
+}
+
+function quickAddStars() {
+  const amount = prompt("How many stars to add?", "100");
+  if (amount && !isNaN(amount)) {
+    spaApp.data.stars += parseInt(amount);
+    spaApp.data.totalEarned += parseInt(amount);
+    spaApp.saveData();
+    spaApp.updateUI();
+    alert(`Added ${amount} stars!`);
+  }
+}
+
+// Initialize login check
+checkLoginStatus();

@@ -1,8 +1,9 @@
 {
   "name": "Jacky Spa Days",
   "short_name": "Spa Days",
-  "description": "Track your spa visits and earn stars for rewards",
-  "start_url": "./",
+  "description": "Track your spa visits and earn stars for rewards - v2.0",
+  "version": "2.0.0",
+  "start_url": "./?v=2.0",
   "display": "standalone",
   "background_color": "#0B0F14",
   "theme_color": "#0B0F14",

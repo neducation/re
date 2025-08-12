@@ -1,4 +1,4 @@
-const CACHE_NAME = "spa-days-v1";
+const CACHE_NAME = "spa-days-v2.0";
 const urlsToCache = [
   "./",
   "./index.html",
@@ -9,9 +9,12 @@ const urlsToCache = [
 ];
 
 self.addEventListener("install", function (event) {
+  // Skip waiting to activate immediately
+  self.skipWaiting();
+
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
-      console.log("Opened cache");
+      console.log("Opened cache:", CACHE_NAME);
       return cache.addAll(urlsToCache);
     })
   );
@@ -19,13 +22,29 @@ self.addEventListener("install", function (event) {
 
 self.addEventListener("fetch", function (event) {
   event.respondWith(
-    caches.match(event.request).then(function (response) {
-      // Return cached version or fetch from network
-      if (response) {
+    fetch(event.request)
+      .then(function (response) {
+        // Always try network first for HTML files
+        if (
+          event.request.url.includes(".html") ||
+          event.request.url.endsWith("/")
+        ) {
+          return response;
+        }
+
+        // For other files, cache then return
+        if (response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(function (cache) {
+            cache.put(event.request, responseClone);
+          });
+        }
         return response;
-      }
-      return fetch(event.request);
-    })
+      })
+      .catch(function () {
+        // Fallback to cache if network fails
+        return caches.match(event.request);
+      })
   );
 });
 

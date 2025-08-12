@@ -461,6 +461,17 @@
         background: rgba(255, 77, 154, 0.1);
       }
 
+      /* Admin Panel Styles */
+      .admin-panel {
+        border-top: 2px solid rgba(255, 77, 154, 0.3);
+        padding-top: 20px;
+        margin-top: 20px;
+      }
+
+      .admin-panel .card-modern {
+        border-left: 3px solid var(--accent-mint);
+      }
+
       .shortcuts {
         display: flex;
         gap: 10px;
@@ -1563,6 +1574,177 @@
           </div>
         </div>
 
+        <!-- Admin Panel (Only for Nathan) -->
+        <div id="admin-panel" class="admin-panel" style="display: none">
+          <h3
+            style="
+              color: var(--accent-mint);
+              margin: 30px 0 20px 0;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+            "
+          >
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"
+              />
+            </svg>
+            Admin Panel
+          </h3>
+
+          <div class="card-modern">
+            <div class="card-content">
+              <div class="card-icon">
+                <svg width="24" height="24" fill="#ff4d9a" viewBox="0 0 24 24">
+                  <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                  />
+                </svg>
+              </div>
+              <div class="card-info">
+                <div class="card-title">App Version</div>
+                <div class="card-subtitle">v2.0 - Updated UI</div>
+              </div>
+              <button class="action-btn-modern" onclick="forceAppUpdate()">
+                <svg
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 8 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-modern">
+            <div class="card-content">
+              <div class="card-icon">
+                <svg width="24" height="24" fill="#ff4d9a" viewBox="0 0 24 24">
+                  <path
+                    d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm0-9V11l-4 4-4-4V7.5l4-4 4 4z"
+                  />
+                </svg>
+              </div>
+              <div class="card-info">
+                <div class="card-title">Export Data</div>
+                <div class="card-subtitle">Backup all app data</div>
+              </div>
+              <button class="action-btn-modern" onclick="exportData()">
+                <svg
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-modern">
+            <div class="card-content">
+              <div class="card-icon">
+                <svg width="24" height="24" fill="#ff4d9a" viewBox="0 0 24 24">
+                  <path
+                    d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
+                  />
+                </svg>
+              </div>
+              <div class="card-info">
+                <div class="card-title">Import Data</div>
+                <div class="card-subtitle">Restore from backup</div>
+              </div>
+              <button
+                class="action-btn-modern"
+                onclick="document.getElementById('import-file').click()"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M9 16v-6H5l7-7 7 7h-4v6H9zm-4 4h14v2H5v-2z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-modern">
+            <div class="card-content">
+              <div class="card-icon">
+                <svg width="24" height="24" fill="#ff4d9a" viewBox="0 0 24 24">
+                  <path
+                    d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,5V19H5V5H19Z"
+                  />
+                </svg>
+              </div>
+              <div class="card-info">
+                <div class="card-title">Clear Cache & Reset</div>
+                <div class="card-subtitle">Force fresh app reload</div>
+              </div>
+              <button
+                class="action-btn-modern"
+                onclick="clearCacheAndReset()"
+                style="border-color: #ff6b6b; color: #ff6b6b"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-modern">
+            <div class="card-content">
+              <div class="card-icon">
+                <svg width="24" height="24" fill="#ff4d9a" viewBox="0 0 24 24">
+                  <path
+                    d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z"
+                  />
+                </svg>
+              </div>
+              <div class="card-info">
+                <div class="card-title">Quick Add Stars</div>
+                <div class="card-subtitle">Add stars for testing</div>
+              </div>
+              <button class="action-btn-modern" onclick="quickAddStars()">
+                <svg
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <input
+            type="file"
+            id="import-file"
+            accept=".json"
+            style="display: none"
+            onchange="importData(event)"
+          />
+        </div>
+
         <button
           class="primary-button"
           id="settings-btn"
@@ -1757,11 +1939,8 @@
         const appContainer = document.getElementById("app-container");
         const loginForm = document.getElementById("login-form");
 
-        // Check if user is already logged in
-        const isLoggedIn = localStorage.getItem("jacky-spa-logged-in");
-        if (isLoggedIn === "true") {
-          showApp();
-        }
+        // Check if user is already logged in - will be handled by spa-app.js
+        // (removed old localStorage check)
 
         // Handle login form submission
         loginForm.addEventListener("submit", function (e) {
@@ -1770,22 +1949,16 @@
           const username = document.getElementById("username").value;
           const password = document.getElementById("password").value;
 
-          // Simple login validation - username must be "Jackster"
-          if (username.toLowerCase() === "jackster") {
-            // Accept any password for demo purposes
-            localStorage.setItem("jacky-spa-logged-in", "true");
-            localStorage.setItem("jacky-spa-username", username);
-            showApp();
+          // Use the new login system from spa-app.js
+          if (loginUser(username, password)) {
+            // Login successful - loginUser handles the UI changes
           } else {
             // Show error
-            showLoginError('Please use username "Jackster"');
+            showLoginError(
+              'Please use username "Jackster" (password can be anything)'
+            );
           }
         });
-
-        function showApp() {
-          loginScreen.style.display = "none";
-          appContainer.style.display = "block";
-        }
 
         function showLoginError(message) {
           // Remove any existing error
@@ -1822,14 +1995,7 @@
 
         // Add logout functionality (can be called from anywhere in the app)
         window.logout = function () {
-          localStorage.removeItem("jacky-spa-logged-in");
-          localStorage.removeItem("jacky-spa-username");
-          loginScreen.style.display = "flex";
-          appContainer.style.display = "none";
-
-          // Clear form
-          document.getElementById("username").value = "";
-          document.getElementById("password").value = "";
+          logout(); // Use the function from spa-app.js
         };
       });
     </script>
