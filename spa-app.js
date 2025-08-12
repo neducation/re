@@ -787,12 +787,17 @@ class SpaApp {
   }
 
   bindShortcuts() {
-    document.querySelectorAll(".shortcut-chip").forEach((chip) => {
-      chip.addEventListener("click", (e) => {
-        const serviceId = e.currentTarget.getAttribute("data-service");
-        this.quickAwardService(serviceId);
+    // Handle both old shortcut-chip and new card-modern structures
+    document
+      .querySelectorAll(".shortcut-chip, .card-modern[data-service]")
+      .forEach((chip) => {
+        chip.addEventListener("click", (e) => {
+          const serviceId = e.currentTarget.getAttribute("data-service");
+          if (serviceId) {
+            this.quickAwardService(serviceId);
+          }
+        });
       });
-    });
   }
 
   bindDailyBonusEvents() {
@@ -1236,7 +1241,11 @@ function hapticFeedback(style = "light") {
 
 // Add haptic to button clicks
 document.addEventListener("click", function (e) {
-  if (e.target.matches("button, .shortcut-chip, .service-item, .switch")) {
+  if (
+    e.target.matches(
+      "button, .shortcut-chip, .service-item, .switch, .card-modern, .action-btn-modern"
+    )
+  ) {
     hapticFeedback("light");
   }
 });

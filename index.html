@@ -29,12 +29,20 @@
       :root {
         --bg-primary: #0b0f14;
         --bg-secondary: #1a1f26;
+        --bg-tertiary: #262d35;
         --accent-pink: #ff4d9a;
         --accent-mint: #44ffc1;
+        --accent-gold: #ffd700;
         --text-primary: #ffffff;
         --text-secondary: #a0a8b8;
+        --text-muted: #6b7280;
         --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        --border-radius: 24px;
+        --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.4);
+        --border-radius: 16px;
+        --border-radius-lg: 24px;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --error: #ef4444;
       }
 
       * {
@@ -53,6 +61,169 @@
         user-select: none;
         height: 100vh;
         position: relative;
+        line-height: 1.5;
+      }
+
+      /* Login Screen Styles */
+      .login-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          135deg,
+          var(--bg-primary) 0%,
+          var(--bg-secondary) 100%
+        );
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 5000;
+        padding: 20px;
+      }
+
+      .login-screen.hidden {
+        display: none;
+      }
+
+      .login-logo {
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(
+          135deg,
+          var(--accent-pink),
+          var(--accent-mint)
+        );
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 40px;
+        box-shadow: var(--shadow-lg);
+      }
+
+      .login-logo svg {
+        width: 60px;
+        height: 60px;
+        color: white;
+      }
+
+      .login-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(
+          45deg,
+          var(--accent-pink),
+          var(--accent-mint)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-align: center;
+        margin-bottom: 8px;
+      }
+
+      .login-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .login-form {
+        width: 100%;
+        max-width: 320px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .input-group {
+        position: relative;
+      }
+
+      .input-group label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+      }
+
+      .input-group input {
+        width: 100%;
+        background: var(--bg-secondary);
+        border: 2px solid transparent;
+        border-radius: var(--border-radius);
+        padding: 16px 20px;
+        font-size: 1rem;
+        color: var(--text-primary);
+        transition: all 0.2s ease;
+      }
+
+      .input-group input:focus {
+        outline: none;
+        border-color: var(--accent-pink);
+        background: var(--bg-tertiary);
+      }
+
+      .input-group input::placeholder {
+        color: var(--text-muted);
+      }
+
+      .login-button {
+        background: linear-gradient(
+          45deg,
+          var(--accent-pink),
+          var(--accent-mint)
+        );
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 18px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: var(--shadow);
+        margin-top: 10px;
+      }
+
+      .login-button:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .login-button:active {
+        transform: translateY(0);
+      }
+
+      .login-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .login-demo-info {
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        border-radius: var(--border-radius);
+        padding: 16px;
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      .login-demo-info .demo-title {
+        font-weight: 600;
+        color: var(--accent-gold);
+        margin-bottom: 8px;
+      }
+
+      .login-demo-info .demo-text {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
       }
 
       .app-container {
@@ -60,6 +231,11 @@
         display: flex;
         flex-direction: column;
         padding-bottom: 90px;
+        background: var(--bg-primary);
+      }
+
+      .app-container.hidden {
+        display: none;
       }
 
       .screen {
@@ -67,11 +243,42 @@
         flex: 1;
         padding: 20px;
         animation: slideIn 0.3s ease-out;
+        max-width: 100vw;
+        overflow-x: hidden;
       }
 
       .screen.active {
         display: flex;
         flex-direction: column;
+      }
+
+      .screen-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        padding: 0 4px;
+      }
+
+      .screen-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .header-action {
+        background: var(--bg-secondary);
+        border: none;
+        border-radius: 12px;
+        padding: 10px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .header-action:hover {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
       }
 
       @keyframes slideIn {
@@ -182,6 +389,76 @@
 
       .primary-button:active {
         transform: scale(0.95);
+      }
+
+      /* Modern Card Styles */
+      .card-modern {
+        background: var(--bg-secondary);
+        border-radius: var(--border-radius);
+        padding: 20px;
+        margin-bottom: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.2s ease;
+      }
+
+      .card-modern:active {
+        transform: scale(0.98);
+        background: var(--bg-tertiary);
+      }
+
+      .card-content {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .card-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 77, 154, 0.1);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .card-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+      }
+
+      .card-subtitle {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        line-height: 1.4;
+      }
+
+      .action-btn-modern {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        border: 2px solid var(--accent-pink);
+        background: transparent;
+        color: var(--accent-pink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+      }
+
+      .action-btn-modern:active {
+        transform: scale(0.95);
+        background: rgba(255, 77, 154, 0.1);
       }
 
       .shortcuts {
@@ -766,7 +1043,55 @@
     </style>
   </head>
   <body>
-    <div class="app-container">
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-screen">
+      <div class="login-logo">
+        <svg fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+          />
+        </svg>
+      </div>
+
+      <h1 class="login-title">Jacky Spa Days</h1>
+      <p class="login-subtitle">Your Personal Spa Companion</p>
+
+      <form class="login-form" id="login-form">
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            placeholder="Enter username"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter password"
+            required
+          />
+        </div>
+
+        <button type="submit" class="login-button" id="login-button">
+          Sign In
+        </button>
+      </form>
+
+      <div class="login-demo-info">
+        <div class="demo-title">Demo Account</div>
+        <div class="demo-text">
+          Username: <strong>Jackster</strong><br />Password:
+          <strong>any password</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="app-container" id="app-container">
       <!-- Home Screen -->
       <div id="home-screen" class="screen active">
         <div class="hero-counter">
@@ -791,7 +1116,7 @@
         <!-- Daily Bonus Card -->
         <div
           id="daily-bonus-card"
-          class="service-item"
+          class="card-modern"
           style="
             margin-bottom: 20px;
             background: linear-gradient(
@@ -802,10 +1127,16 @@
             border: none;
           "
         >
-          <div class="service-info">
-            <span class="service-icon">🎁</span>
-            <div>
-              <div class="service-name" style="color: white; font-weight: 600">
+          <div class="card-content">
+            <div class="card-icon" style="background: rgba(255, 255, 255, 0.2)">
+              <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
+                <path
+                  d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"
+                />
+              </svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title" style="color: white; font-weight: 600">
                 Daily Bonus Available!
               </div>
               <div
@@ -815,18 +1146,25 @@
                 Claim your daily bonus now
               </div>
             </div>
+            <button
+              class="action-btn-modern"
+              id="claim-daily-btn"
+              style="
+                border-color: white;
+                color: white;
+                background: rgba(255, 255, 255, 0.2);
+              "
+            >
+              <svg
+                width="20"
+                height="20"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+              </svg>
+            </button>
           </div>
-          <button
-            class="stepper-btn"
-            id="claim-daily-btn"
-            style="
-              border-color: white;
-              color: white;
-              background: rgba(255, 255, 255, 0.2);
-            "
-          >
-            ✓
-          </button>
         </div>
 
         <button class="primary-button" id="start-visit-btn">
@@ -834,24 +1172,97 @@
         </button>
 
         <div class="shortcuts" id="shortcuts">
-          <div class="shortcut-chip" data-service="nail-session">
-            💅 Nail Session
+          <div class="card-modern" data-service="nail-session">
+            <div class="card-content">
+              <div class="card-icon">
+                <svg width="24" height="24" fill="#ff4d9a" viewBox="0 0 24 24">
+                  <path
+                    d="M11.5 2C9.6 2 8 3.6 8 5.5S9.6 9 11.5 9 15 7.4 15 5.5 13.4 2 11.5 2zm1 14.5c0 .8-.7 1.5-1.5 1.5s-1.5-.7-1.5-1.5.7-1.5 1.5-1.5 1.5.7 1.5 1.5zm-3-3c0 .8-.7 1.5-1.5 1.5S7 14.3 7 13.5 7.7 12 8.5 12s1.5.7 1.5 1.5zm6 0c0 .8-.7 1.5-1.5 1.5s-1.5-.7-1.5-1.5.7-1.5 1.5-1.5 1.5.7 1.5 1.5z"
+                  />
+                </svg>
+              </div>
+              <div class="card-info">
+                <div class="card-title">Nail Session</div>
+                <div class="card-subtitle">Professional manicure & polish</div>
+              </div>
+              <button class="action-btn-modern">
+                <svg
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                </svg>
+              </button>
+            </div>
           </div>
-          <div class="shortcut-chip" data-service="massage">💆‍♀️ Massage</div>
-          <div class="shortcut-chip" data-service="snack-tea">🍵 Snack/Tea</div>
+
+          <div class="card-modern" data-service="massage">
+            <div class="card-content">
+              <div class="card-icon">
+                <svg width="24" height="24" fill="#ff4d9a" viewBox="0 0 24 24">
+                  <path
+                    d="M9 21c0 .5.4 1 1 1s1-.5 1-1v-1H9v1zm3-4H8l-1.2-6.2L9 11V9.5C9 8.1 10.1 7 11.5 7S14 8.1 14 9.5V11l2.2-.2L15 16.8h-3v.2z"
+                  />
+                </svg>
+              </div>
+              <div class="card-info">
+                <div class="card-title">Relaxing Massage</div>
+                <div class="card-subtitle">Therapeutic body treatment</div>
+              </div>
+              <button class="action-btn-modern">
+                <svg
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-modern" data-service="snack-tea">
+            <div class="card-content">
+              <div class="card-icon">
+                <svg width="24" height="24" fill="#ff4d9a" viewBox="0 0 24 24">
+                  <path
+                    d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3z"
+                  />
+                </svg>
+              </div>
+              <div class="card-info">
+                <div class="card-title">Tea & Snacks</div>
+                <div class="card-subtitle">Refreshments & light bites</div>
+              </div>
+              <button class="action-btn-modern">
+                <svg
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div class="service-item" style="margin-top: 20px">
-          <div class="service-info">
-            <span class="service-icon">📊</span>
-            <div>
-              <div class="service-name">Last visit summary</div>
-              <div
-                style="font-size: 0.9rem; color: var(--text-secondary)"
-                id="last-visit"
-              >
-                No visits yet
-              </div>
+        <div class="card-modern" style="margin-top: 20px">
+          <div class="card-content">
+            <div class="card-icon">
+              <svg width="24" height="24" fill="#ff4d9a" viewBox="0 0 24 24">
+                <path
+                  d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.25l1.25-1.25L12 9.25 9.75 11.5 3.5 5.25 2.25 6.5l8 8 8.25-8.25z"
+                />
+              </svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title">Last Visit Summary</div>
+              <div class="card-subtitle" id="last-visit">No visits yet</div>
             </div>
           </div>
         </div>
@@ -879,11 +1290,16 @@
               gap: 10px;
             "
           >
-            <span>🎁</span> Daily Bonus
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"
+              />
+            </svg>
+            Daily Bonus
           </h3>
 
           <div
-            class="service-item"
+            class="card-modern"
             id="daily-bonus-main"
             style="
               background: linear-gradient(
@@ -894,30 +1310,53 @@
               border: 2px solid var(--accent-pink);
             "
           >
-            <div class="service-info">
-              <span class="service-icon" id="daily-bonus-icon">🎁</span>
-              <div>
-                <div class="service-name" id="daily-bonus-title">
+            <div class="card-content">
+              <div
+                class="card-icon"
+                style="background: rgba(255, 77, 154, 0.2)"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  fill="#ff4d9a"
+                  viewBox="0 0 24 24"
+                  id="daily-bonus-icon"
+                >
+                  <path
+                    d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"
+                  />
+                </svg>
+              </div>
+              <div class="card-info">
+                <div class="card-title" id="daily-bonus-title">
                   Daily Bonus Available
                 </div>
-                <div
-                  style="font-size: 0.9rem; color: var(--text-secondary)"
-                  id="daily-bonus-desc"
-                >
+                <div class="card-subtitle" id="daily-bonus-desc">
                   Claim between 12:00 AM - 11:59 PM
                 </div>
               </div>
-            </div>
-            <div
-              style="
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 5px;
-              "
-            >
-              <div class="service-stars" id="daily-bonus-stars">+50 ⭐</div>
-              <button class="stepper-btn" id="claim-daily-main-btn">✓</button>
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 5px;
+                "
+              >
+                <div class="service-stars" id="daily-bonus-stars">+50 ⭐</div>
+                <button class="action-btn-modern" id="claim-daily-main-btn">
+                  <svg
+                    width="20"
+                    height="20"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -940,23 +1379,29 @@
               gap: 10px;
             "
           >
-            <span>🔥</span> Login Streak
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"
+              />
+            </svg>
+            Login Streak
           </h3>
 
-          <div class="service-item" style="margin-bottom: 15px">
-            <div class="service-info">
-              <span class="service-icon">📅</span>
-              <div>
-                <div class="service-name">Current Streak</div>
-                <div
-                  style="color: var(--text-secondary)"
-                  id="login-streak-days"
-                >
-                  0 days
-                </div>
+          <div class="card-modern" style="margin-bottom: 15px">
+            <div class="card-content">
+              <div class="card-icon">
+                <svg width="24" height="24" fill="#ff4d9a" viewBox="0 0 24 24">
+                  <path
+                    d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zM19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"
+                  />
+                </svg>
               </div>
+              <div class="card-info">
+                <div class="card-title">Current Streak</div>
+                <div class="card-subtitle" id="login-streak-days">0 days</div>
+              </div>
+              <div class="service-stars" id="streak-multiplier">×1.0</div>
             </div>
-            <div class="service-stars" id="streak-multiplier">×1.0</div>
           </div>
 
           <!-- Streak Progress -->
@@ -1070,38 +1515,50 @@
       <div id="profile-screen" class="screen">
         <h2 style="margin-bottom: 20px">Profile</h2>
 
-        <div class="service-item">
-          <div class="service-info">
-            <span class="service-icon">⭐</span>
-            <div>
-              <div class="service-name">Total Stars Earned</div>
-              <div style="color: var(--text-secondary)" id="total-earned">
-                0 ⭐
-              </div>
+        <div class="card-modern">
+          <div class="card-content">
+            <div class="card-icon">
+              <svg width="24" height="24" fill="#ff4d9a" viewBox="0 0 24 24">
+                <path
+                  d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                />
+              </svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title">Total Stars Earned</div>
+              <div class="card-subtitle" id="total-earned">0 ⭐</div>
             </div>
           </div>
         </div>
 
-        <div class="service-item">
-          <div class="service-info">
-            <span class="service-icon">🏆</span>
-            <div>
-              <div class="service-name">Total Visits</div>
-              <div style="color: var(--text-secondary)" id="total-visits">
-                0
-              </div>
+        <div class="card-modern">
+          <div class="card-content">
+            <div class="card-icon">
+              <svg width="24" height="24" fill="#ff4d9a" viewBox="0 0 24 24">
+                <path
+                  d="M5 16L3 14l5.5-5.5L16 16l-2.5 2.5L8 13l-3 3zm2.5-7L5 6.5 8.5 3 11 5.5 8.5 8zm6.5 6.5L11 18l2.5 2.5L17 17l-3-1.5z"
+                />
+              </svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title">Total Visits</div>
+              <div class="card-subtitle" id="total-visits">0</div>
             </div>
           </div>
         </div>
 
-        <div class="service-item">
-          <div class="service-info">
-            <span class="service-icon">🔥</span>
-            <div>
-              <div class="service-name">Current Streak</div>
-              <div style="color: var(--text-secondary)" id="current-streak">
-                0 weeks
-              </div>
+        <div class="card-modern">
+          <div class="card-content">
+            <div class="card-icon">
+              <svg width="24" height="24" fill="#ff4d9a" viewBox="0 0 24 24">
+                <path
+                  d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"
+                />
+              </svg>
+            </div>
+            <div class="card-info">
+              <div class="card-title">Current Streak</div>
+              <div class="card-subtitle" id="current-streak">0 weeks</div>
             </div>
           </div>
         </div>
@@ -1113,28 +1570,68 @@
         >
           Settings
         </button>
+
+        <button
+          class="primary-button"
+          onclick="logout()"
+          style="
+            margin-top: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
+            color: white;
+          "
+        >
+          Sign Out
+        </button>
       </div>
 
       <!-- Tab Bar -->
       <div class="tab-bar">
         <button class="tab-button active" data-screen="home">
-          <div class="tab-icon">🏠</div>
+          <div class="tab-icon">
+            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg>
+          </div>
           <div>Home</div>
         </button>
         <button class="tab-button" data-screen="daily">
-          <div class="tab-icon">🎁</div>
+          <div class="tab-icon">
+            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"
+              />
+            </svg>
+          </div>
           <div>Daily</div>
         </button>
         <button class="tab-button" data-screen="rewards">
-          <div class="tab-icon">�</div>
+          <div class="tab-icon">
+            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              />
+            </svg>
+          </div>
           <div>Rewards</div>
         </button>
         <button class="tab-button" data-screen="history">
-          <div class="tab-icon">📋</div>
+          <div class="tab-icon">
+            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h8c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"
+              />
+            </svg>
+          </div>
           <div>History</div>
         </button>
         <button class="tab-button" data-screen="profile">
-          <div class="tab-icon">👤</div>
+          <div class="tab-icon">
+            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+              />
+            </svg>
+          </div>
           <div>Profile</div>
         </button>
       </div>
@@ -1252,6 +1749,90 @@
         </button>
       </div>
     </div>
+
+    <!-- Login Functionality -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const loginScreen = document.getElementById("login-screen");
+        const appContainer = document.getElementById("app-container");
+        const loginForm = document.getElementById("login-form");
+
+        // Check if user is already logged in
+        const isLoggedIn = localStorage.getItem("jacky-spa-logged-in");
+        if (isLoggedIn === "true") {
+          showApp();
+        }
+
+        // Handle login form submission
+        loginForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
+
+          // Simple login validation - username must be "Jackster"
+          if (username.toLowerCase() === "jackster") {
+            // Accept any password for demo purposes
+            localStorage.setItem("jacky-spa-logged-in", "true");
+            localStorage.setItem("jacky-spa-username", username);
+            showApp();
+          } else {
+            // Show error
+            showLoginError('Please use username "Jackster"');
+          }
+        });
+
+        function showApp() {
+          loginScreen.style.display = "none";
+          appContainer.style.display = "block";
+        }
+
+        function showLoginError(message) {
+          // Remove any existing error
+          const existingError = document.querySelector(".login-error");
+          if (existingError) {
+            existingError.remove();
+          }
+
+          // Create error message
+          const errorDiv = document.createElement("div");
+          errorDiv.className = "login-error";
+          errorDiv.style.cssText = `
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid #ff4d4d;
+            color: #ff4d4d;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.9rem;
+          `;
+          errorDiv.textContent = message;
+
+          // Insert after the form
+          loginForm.parentNode.insertBefore(errorDiv, loginForm.nextSibling);
+
+          // Remove error after 3 seconds
+          setTimeout(() => {
+            if (errorDiv.parentNode) {
+              errorDiv.remove();
+            }
+          }, 3000);
+        }
+
+        // Add logout functionality (can be called from anywhere in the app)
+        window.logout = function () {
+          localStorage.removeItem("jacky-spa-logged-in");
+          localStorage.removeItem("jacky-spa-username");
+          loginScreen.style.display = "flex";
+          appContainer.style.display = "none";
+
+          // Clear form
+          document.getElementById("username").value = "";
+          document.getElementById("password").value = "";
+        };
+      });
+    </script>
 
     <script src="spa-app.js"></script>
   </body>
