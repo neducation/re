@@ -529,6 +529,240 @@
         );
         transition: width 0.3s ease;
       }
+
+      /* Welcome Message Overlay */
+      .welcome-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(11, 15, 20, 0.95) 0%,
+          rgba(255, 77, 154, 0.3) 50%,
+          rgba(68, 255, 193, 0.3) 100%
+        );
+        backdrop-filter: blur(20px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 3000;
+        animation: welcomeFadeIn 0.5s ease-out;
+      }
+
+      .welcome-overlay.active {
+        display: flex;
+      }
+
+      @keyframes welcomeFadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes welcomeFadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+
+      .welcome-card {
+        background: linear-gradient(
+          135deg,
+          var(--bg-secondary),
+          rgba(255, 77, 154, 0.1)
+        );
+        border-radius: 32px;
+        padding: 60px 40px;
+        text-align: center;
+        max-width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        border: 2px solid rgba(255, 77, 154, 0.3);
+        animation: welcomeSlideUp 0.6s ease-out 0.2s both;
+      }
+
+      @keyframes welcomeSlideUp {
+        from {
+          opacity: 0;
+          transform: translateY(50px) scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .welcome-title {
+        font-family: "Brush Script MT", cursive, -apple-system,
+          BlinkMacSystemFont, sans-serif;
+        font-size: 3.5rem;
+        font-weight: bold;
+        background: linear-gradient(
+          45deg,
+          #ff69b4,
+          #ff1493,
+          #ffb6c1,
+          #ff69b4,
+          #c71585,
+          #ff1493
+        );
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 30px rgba(255, 105, 180, 0.5);
+        margin-bottom: 15px;
+        letter-spacing: 2px;
+        animation: welcomeGradient 3s ease-in-out infinite,
+          welcomePulse 2s ease-in-out infinite;
+      }
+
+      @keyframes welcomeGradient {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+
+      @keyframes welcomePulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .welcome-subtitle {
+        font-size: 1.4rem;
+        color: var(--accent-mint);
+        margin-bottom: 20px;
+        font-weight: 600;
+        text-shadow: 0 0 20px rgba(68, 255, 193, 0.3);
+      }
+
+      .welcome-message {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+
+      .welcome-sparkles {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .sparkle {
+        position: absolute;
+        color: var(--accent-pink);
+        font-size: 1.5rem;
+        animation: sparkleFloat 4s ease-in-out infinite;
+        opacity: 0.7;
+      }
+
+      @keyframes sparkleFloat {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+          opacity: 0.7;
+        }
+        25% {
+          transform: translateY(-20px) rotate(90deg);
+          opacity: 1;
+        }
+        50% {
+          transform: translateY(-10px) rotate(180deg);
+          opacity: 0.8;
+        }
+        75% {
+          transform: translateY(-30px) rotate(270deg);
+          opacity: 1;
+        }
+      }
+
+      .welcome-button {
+        background: linear-gradient(
+          45deg,
+          var(--accent-pink),
+          var(--accent-mint)
+        );
+        border: none;
+        border-radius: 25px;
+        padding: 15px 40px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: white;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 10px 30px rgba(255, 77, 154, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .welcome-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 40px rgba(255, 77, 154, 0.4);
+      }
+
+      .welcome-button:active {
+        transform: translateY(0);
+      }
+
+      /* Mobile responsiveness for welcome */
+      @media (max-width: 480px) {
+        .welcome-title {
+          font-size: 2.8rem;
+        }
+
+        .welcome-subtitle {
+          font-size: 1.2rem;
+        }
+
+        .welcome-card {
+          padding: 40px 30px;
+          margin: 20px;
+        }
+
+        .welcome-message {
+          font-size: 1rem;
+        }
+      }
+
+      @media (max-height: 600px) {
+        .welcome-card {
+          padding: 30px 25px;
+        }
+
+        .welcome-title {
+          font-size: 2.5rem;
+          margin-bottom: 10px;
+        }
+
+        .welcome-subtitle {
+          font-size: 1.1rem;
+          margin-bottom: 15px;
+        }
+
+        .welcome-message {
+          font-size: 0.95rem;
+          margin-bottom: 20px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -964,6 +1198,58 @@
             Award Stars
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Welcome Overlay -->
+    <div id="welcome-overlay" class="welcome-overlay">
+      <div class="welcome-card">
+        <div class="welcome-sparkles">
+          <div class="sparkle" style="top: 10%; left: 15%; animation-delay: 0s">
+            ✨
+          </div>
+          <div
+            class="sparkle"
+            style="top: 20%; right: 20%; animation-delay: 1s"
+          >
+            ⭐
+          </div>
+          <div
+            class="sparkle"
+            style="bottom: 30%; left: 10%; animation-delay: 2s"
+          >
+            💎
+          </div>
+          <div
+            class="sparkle"
+            style="bottom: 15%; right: 15%; animation-delay: 0.5s"
+          >
+            ✨
+          </div>
+          <div
+            class="sparkle"
+            style="top: 50%; left: 5%; animation-delay: 1.5s"
+          >
+            🌟
+          </div>
+          <div
+            class="sparkle"
+            style="top: 30%; right: 10%; animation-delay: 2.5s"
+          >
+            💫
+          </div>
+        </div>
+
+        <h1 class="welcome-title">Welcome Jacky!</h1>
+        <p class="welcome-subtitle">✨ Ready for Your Spa Day? ✨</p>
+        <p class="welcome-message">
+          Your luxurious spa experience awaits! Track your visits, earn
+          sparkling stars, and unlock amazing rewards. Let's make today
+          absolutely beautiful! 💅✨
+        </p>
+        <button class="welcome-button" id="welcome-continue-btn">
+          Start Sparkling
+        </button>
       </div>
     </div>
 

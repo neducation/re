@@ -11,6 +11,7 @@ class SpaApp {
     this.bindEvents();
     this.updateUI();
     this.setupServiceWorker();
+    this.showWelcomeIfNeeded();
   }
 
   // Data Management
@@ -30,6 +31,7 @@ class SpaApp {
       loginStreak: 0,
       lastLoginDate: null,
       totalLoginDays: 0,
+      isFirstVisit: true,
       // Weekly challenges
       weeklyProgress: {
         visits: 0,
@@ -247,6 +249,144 @@ class SpaApp {
     ];
 
     return challenges;
+  }
+
+  // Welcome System
+  showWelcomeIfNeeded() {
+    // Show welcome message for first-time users or returning users after a long break
+    const shouldShowWelcome = this.data.isFirstVisit || this.isReturningUser();
+
+    if (shouldShowWelcome) {
+      setTimeout(() => {
+        this.showWelcomeMessage();
+      }, 1000); // Show after 1 second to let the app load
+    }
+  }
+
+  isReturningUser() {
+    if (!this.data.lastLoginDate) return false;
+
+    const lastLogin = new Date(this.data.lastLoginDate);
+    const now = new Date();
+    const daysDiff = Math.floor((now - lastLogin) / (1000 * 60 * 60 * 24));
+
+    // Show welcome if user hasn't logged in for 7+ days
+    return daysDiff >= 7;
+  }
+
+  showWelcomeMessage() {
+    const welcomeOverlay = document.getElementById("welcome-overlay");
+    const continueBtn = document.getElementById("welcome-continue-btn");
+
+    if (welcomeOverlay) {
+      // Update welcome message based on user state
+      this.updateWelcomeContent();
+
+      welcomeOverlay.classList.add("active");
+
+      // Add sparkle effect
+      this.addWelcomeSparkles();
+
+      // Bind continue button
+      if (continueBtn) {
+        continueBtn.addEventListener("click", () => {
+          this.hideWelcomeMessage();
+        });
+      }
+
+      // Auto-hide after 10 seconds if user doesn't interact
+      setTimeout(() => {
+        if (welcomeOverlay.classList.contains("active")) {
+          this.hideWelcomeMessage();
+        }
+      }, 10000);
+
+      // Mark as not first visit
+      this.data.isFirstVisit = false;
+      this.saveData();
+    }
+  }
+
+  updateWelcomeContent() {
+    const titleEl = document.querySelector(".welcome-title");
+    const subtitleEl = document.querySelector(".welcome-subtitle");
+    const messageEl = document.querySelector(".welcome-message");
+    const buttonEl = document.querySelector(".welcome-button");
+
+    if (!titleEl || !subtitleEl || !messageEl || !buttonEl) return;
+
+    let title = "Welcome Jacky!";
+    let subtitle = "✨ Ready for Your Spa Day? ✨";
+    let message =
+      "Your luxurious spa experience awaits! Track your visits, earn sparkling stars, and unlock amazing rewards. Let's make today absolutely beautiful! 💅✨";
+    let buttonText = "Start Sparkling";
+
+    if (this.data.isFirstVisit) {
+      title = "Welcome to Jacky Spa Days!";
+      subtitle = "✨ Your Sparkling Journey Begins! ✨";
+      message =
+        "Welcome to your personal spa tracking paradise! Earn stars for every treatment, unlock fabulous rewards, and track your glow-up journey. Ready to sparkle? 💎✨";
+      buttonText = "Begin My Journey";
+    } else if (this.isReturningUser()) {
+      title = "Welcome Back, Jacky!";
+      subtitle = `🌟 We Missed You! (${this.data.loginStreak} day streak) 🌟`;
+      message = `So excited to see you again! You've earned ${this.data.totalEarned.toLocaleString()} stars total and completed ${
+        this.data.visits.length
+      } spa visits. Ready for another fabulous session? 💅✨`;
+      buttonText = "Continue Sparkling";
+    } else if (this.data.loginStreak >= 7) {
+      title = "Sparkling Streak Queen!";
+      subtitle = `🔥 ${this.data.loginStreak} Day Streak! You're on fire! 🔥`;
+      message = `Absolutely incredible! Your ${this.data.loginStreak}-day streak is absolutely stunning! Keep this amazing momentum going and earn even more fabulous rewards! 👑✨`;
+      buttonText = "Keep Sparkling";
+    }
+
+    titleEl.textContent = title;
+    subtitleEl.textContent = subtitle;
+    messageEl.textContent = message;
+    buttonEl.textContent = buttonText;
+  }
+
+  hideWelcomeMessage() {
+    const welcomeOverlay = document.getElementById("welcome-overlay");
+    if (welcomeOverlay) {
+      welcomeOverlay.style.animation = "welcomeFadeOut 0.3s ease-out forwards";
+      setTimeout(() => {
+        welcomeOverlay.classList.remove("active");
+        welcomeOverlay.style.animation = "";
+      }, 300);
+    }
+  }
+
+  addWelcomeSparkles() {
+    // Add dynamic sparkles around the welcome message
+    const sparklesContainer = document.querySelector(".welcome-sparkles");
+    if (!sparklesContainer) return;
+
+    const sparkleEmojis = ["✨", "⭐", "💎", "🌟", "💫", "🎀", "💅", "🦋"];
+
+    // Add 8 more random sparkles
+    for (let i = 0; i < 8; i++) {
+      setTimeout(() => {
+        const sparkle = document.createElement("div");
+        sparkle.className = "sparkle";
+        sparkle.textContent =
+          sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+        sparkle.style.top = Math.random() * 80 + 10 + "%";
+        sparkle.style.left = Math.random() * 80 + 10 + "%";
+        sparkle.style.animationDelay = Math.random() * 2 + "s";
+        sparkle.style.animationDuration = Math.random() * 2 + 3 + "s";
+
+        sparklesContainer.appendChild(sparkle);
+
+        // Remove sparkle after animation
+        setTimeout(() => {
+          if (sparkle.parentNode) {
+            sparkle.parentNode.removeChild(sparkle);
+          }
+        }, 5000);
+      }, i * 200);
+    }
   }
 
   // UI Updates
@@ -598,6 +738,7 @@ class SpaApp {
     this.bindServiceEvents();
     this.bindBonusEvents();
     this.bindShortcuts();
+    this.bindDailyBonusEvents();
   }
 
   bindServiceEvents() {
@@ -652,6 +793,20 @@ class SpaApp {
         this.quickAwardService(serviceId);
       });
     });
+  }
+
+  bindDailyBonusEvents() {
+    // Home daily bonus button
+    const claimDailyBtn = document.getElementById("claim-daily-btn");
+    if (claimDailyBtn) {
+      claimDailyBtn.addEventListener("click", () => this.claimDailyBonus());
+    }
+
+    // Daily screen daily bonus button
+    const claimDailyMainBtn = document.getElementById("claim-daily-main-btn");
+    if (claimDailyMainBtn) {
+      claimDailyMainBtn.addEventListener("click", () => this.claimDailyBonus());
+    }
   }
 
   // Screen Navigation
