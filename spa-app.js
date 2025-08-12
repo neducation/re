@@ -400,6 +400,33 @@ class SpaApp {
     this.updateProfile();
     this.updateLastVisit();
     this.updateDailyScreen();
+    this.updateMiniStats();
+  }
+
+  updateMiniStats() {
+    const streakCard = document.querySelector(
+      ".mini-card:first-child .mini-value"
+    );
+    const bonusCard = document.querySelector(
+      ".mini-card:nth-child(2) .mini-value"
+    );
+    const spinsCard = document.querySelector(
+      ".mini-card:nth-child(3) .mini-value"
+    );
+
+    if (streakCard) {
+      streakCard.textContent = this.data.loginStreak || 0;
+    }
+    if (bonusCard) {
+      const today = new Date().toDateString();
+      const collected = this.data.lastDailyBonus === today;
+      bonusCard.textContent = collected ? "Done" : "Ready";
+    }
+    if (spinsCard) {
+      const today = new Date().toDateString();
+      const used = this.data.lastSpin === today;
+      spinsCard.textContent = used ? "0" : "1";
+    }
   }
 
   updateStarDisplay() {
@@ -807,10 +834,20 @@ class SpaApp {
       claimDailyBtn.addEventListener("click", () => this.claimDailyBonus());
     }
 
-    // Daily screen daily bonus button
+    // Daily screen daily bonus button (old)
     const claimDailyMainBtn = document.getElementById("claim-daily-main-btn");
     if (claimDailyMainBtn) {
       claimDailyMainBtn.addEventListener("click", () => this.claimDailyBonus());
+    }
+
+    // Daily screen compact bonus button (new)
+    const claimDailyCompactBtn = document.getElementById(
+      "claim-daily-compact-btn"
+    );
+    if (claimDailyCompactBtn) {
+      claimDailyCompactBtn.addEventListener("click", () =>
+        this.claimDailyBonus()
+      );
     }
   }
 
@@ -1439,3 +1476,158 @@ function quickAddStars() {
 
 // Initialize login check
 checkLoginStatus();
+
+// Spin Wheel Functionality
+class SpinWheel {
+  constructor() {
+    this.prizes = [
+      { name: "50 Stars", value: 50, type: "stars" },
+      { name: "100 Stars", value: 100, type: "stars" },
+      { name: "Free Massage", value: 1, type: "service" },
+      { name: "25 Stars", value: 25, type: "stars" },
+      { name: "Double Bonus", value: 2, type: "multiplier" },
+      { name: "75 Stars", value: 75, type: "stars" },
+      { name: "Spa Package", value: 200, type: "stars" },
+      { name: "Lucky Bonus", value: 150, type: "stars" },
+    ];
+    this.isSpinning = false;
+    this.init();
+  }
+
+  init() {
+    const spinButton = document.getElementById("spin-button");
+    const claimButton = document.getElementById("claim-prize-btn");
+
+    if (spinButton) {
+      spinButton.addEventListener("click", () => this.spin());
+    }
+
+    if (claimButton) {
+      claimButton.addEventListener("click", () => this.claimPrize());
+    }
+
+    this.updateSpinAvailability();
+  }
+
+  canSpin() {
+    const lastSpin = localStorage.getItem("spa-app-last-spin");
+    if (!lastSpin) return true;
+
+    const lastSpinDate = new Date(lastSpin);
+    const today = new Date();
+
+    return lastSpinDate.toDateString() !== today.toDateString();
+  }
+
+  updateSpinAvailability() {
+    const spinButton = document.getElementById("spin-button");
+    const miniSpin = document.getElementById("mini-spin");
+
+    if (this.canSpin()) {
+      if (spinButton) {
+        spinButton.disabled = false;
+        spinButton.style.opacity = "1";
+        spinButton.style.cursor = "pointer";
+      }
+      if (miniSpin) miniSpin.textContent = "1";
+    } else {
+      if (spinButton) {
+        spinButton.disabled = true;
+        spinButton.style.opacity = "0.5";
+        spinButton.style.cursor = "not-allowed";
+      }
+      if (miniSpin) miniSpin.textContent = "0";
+    }
+  }
+
+  spin() {
+    if (!this.canSpin() || this.isSpinning) return;
+
+    this.isSpinning = true;
+    const wheel = document.getElementById("spin-wheel");
+    const resultDiv = document.getElementById("spin-result");
+
+    // Random prize index
+    const prizeIndex = Math.floor(Math.random() * this.prizes.length);
+    const prize = this.prizes[prizeIndex];
+
+    // Calculate rotation (each segment is 45 degrees)
+    const segmentAngle = 360 / 8;
+    const finalRotation = 1800 + prizeIndex * segmentAngle; // 5 full rotations + prize position
+
+    // Apply rotation
+    wheel.style.transform = `rotate(${finalRotation}deg)`;
+
+    // Show result after animation
+    setTimeout(() => {
+      this.showResult(prize);
+      this.isSpinning = false;
+
+      // Mark spin as used for today
+      localStorage.setItem("spa-app-last-spin", new Date().toISOString());
+      this.updateSpinAvailability();
+    }, 3000);
+  }
+
+  showResult(prize) {
+    const resultDiv = document.getElementById("spin-result");
+    const prizeDiv = document.getElementById("result-prize");
+
+    if (prizeDiv) {
+      prizeDiv.textContent = prize.name;
+    }
+
+    if (resultDiv) {
+      resultDiv.style.display = "block";
+    }
+
+    // Store the won prize
+    this.currentPrize = prize;
+  }
+
+  claimPrize() {
+    if (!this.currentPrize) return;
+
+    const prize = this.currentPrize;
+
+    switch (prize.type) {
+      case "stars":
+        spaApp.data.stars += prize.value;
+        spaApp.data.totalEarned += prize.value;
+        break;
+      case "service":
+        // Add a free service voucher
+        spaApp.data.vouchers.push({
+          id: Date.now(),
+          type: "Free Massage",
+          description: "Complimentary relaxing massage session",
+          value: "Free",
+          expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        });
+        break;
+      case "multiplier":
+        // Give double bonus for today
+        const bonusAmount = 50 * prize.value;
+        spaApp.data.stars += bonusAmount;
+        spaApp.data.totalEarned += bonusAmount;
+        break;
+    }
+
+    spaApp.saveData();
+    spaApp.updateUI();
+
+    // Hide result
+    const resultDiv = document.getElementById("spin-result");
+    if (resultDiv) {
+      resultDiv.style.display = "none";
+    }
+
+    // Show success message
+    spaApp.showToast(`🎉 You claimed: ${prize.name}!`);
+
+    this.currentPrize = null;
+  }
+}
+
+// Initialize spin wheel
+const spinWheel = new SpinWheel();
