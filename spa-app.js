@@ -6,6 +6,8 @@ class SpaApp {
   }
 
   init() {
+    this.checkDailyReset();
+    this.updateLoginStreak();
     this.bindEvents();
     this.updateUI();
     this.setupServiceWorker();
@@ -22,6 +24,19 @@ class SpaApp {
       lastVisitAt: null,
       dailyAwarded: 0,
       lastAwardDate: null,
+      // Daily bonus system
+      dailyBonusClaimed: false,
+      lastDailyBonusDate: null,
+      loginStreak: 0,
+      lastLoginDate: null,
+      totalLoginDays: 0,
+      // Weekly challenges
+      weeklyProgress: {
+        visits: 0,
+        starsEarned: 0,
+        servicesUsed: new Set(),
+        weekStart: null,
+      },
       settings: {
         sounds: true,
         haptics: true,
@@ -31,7 +46,20 @@ class SpaApp {
 
     try {
       const saved = localStorage.getItem("spa-app-data");
-      return saved ? { ...defaultData, ...JSON.parse(saved) } : defaultData;
+      if (saved) {
+        const parsedData = { ...defaultData, ...JSON.parse(saved) };
+        // Convert Array back to Set for servicesUsed
+        if (
+          parsedData.weeklyProgress &&
+          parsedData.weeklyProgress.servicesUsed
+        ) {
+          parsedData.weeklyProgress.servicesUsed = new Set(
+            parsedData.weeklyProgress.servicesUsed
+          );
+        }
+        return parsedData;
+      }
+      return defaultData;
     } catch (e) {
       console.error("Error loading data:", e);
       return defaultData;
@@ -40,7 +68,15 @@ class SpaApp {
 
   saveData() {
     try {
-      localStorage.setItem("spa-app-data", JSON.stringify(this.data));
+      // Convert Set to Array for JSON serialization
+      const dataToSave = {
+        ...this.data,
+        weeklyProgress: {
+          ...this.data.weeklyProgress,
+          servicesUsed: Array.from(this.data.weeklyProgress.servicesUsed || []),
+        },
+      };
+      localStorage.setItem("spa-app-data", JSON.stringify(dataToSave));
     } catch (e) {
       console.error("Error saving data:", e);
     }
@@ -79,15 +115,151 @@ class SpaApp {
     ];
   }
 
+  // Daily Bonus System
+  checkDailyReset() {
+    const today = new Date().toDateString();
+
+    // Reset daily bonus if it's a new day
+    if (this.data.lastDailyBonusDate !== today) {
+      this.data.dailyBonusClaimed = false;
+    }
+
+    // Reset weekly challenges if it's a new week
+    const now = new Date();
+    const weekStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() - now.getDay()
+    );
+    const weekStartStr = weekStart.toDateString();
+
+    if (this.data.weeklyProgress.weekStart !== weekStartStr) {
+      this.data.weeklyProgress = {
+        visits: 0,
+        starsEarned: 0,
+        servicesUsed: new Set(),
+        weekStart: weekStartStr,
+      };
+    }
+  }
+
+  updateLoginStreak() {
+    const today = new Date().toDateString();
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toDateString();
+
+    if (this.data.lastLoginDate === today) {
+      // Already logged in today, no change
+      return;
+    }
+
+    if (this.data.lastLoginDate === yesterdayStr) {
+      // Consecutive day login
+      this.data.loginStreak += 1;
+    } else if (
+      this.data.lastLoginDate === null ||
+      this.data.lastLoginDate !== yesterdayStr
+    ) {
+      // First login or streak broken
+      this.data.loginStreak = 1;
+    }
+
+    this.data.lastLoginDate = today;
+    this.data.totalLoginDays += 1;
+    this.saveData();
+  }
+
+  getDailyBonusAmount() {
+    const baseBonus = 50;
+    const streakMultiplier = Math.min(this.data.loginStreak * 0.1, 2.0); // Max 2x multiplier
+    return Math.floor(baseBonus + baseBonus * streakMultiplier);
+  }
+
+  claimDailyBonus() {
+    if (this.data.dailyBonusClaimed) {
+      this.showToast("Daily bonus already claimed!");
+      return;
+    }
+
+    const bonusAmount = this.getDailyBonusAmount();
+    this.data.stars += bonusAmount;
+    this.data.totalEarned += bonusAmount;
+    this.data.dailyBonusClaimed = true;
+    this.data.lastDailyBonusDate = new Date().toDateString();
+
+    this.saveData();
+    this.updateUI();
+    this.showStarBurst();
+    this.showToast(`🎁 Daily bonus claimed! +${bonusAmount} ⭐`);
+  }
+
+  getStreakRewards() {
+    return [
+      {
+        days: 3,
+        reward: "🌟 Star Multiplier ×1.2",
+        claimed: this.data.loginStreak >= 3,
+      },
+      { days: 7, reward: "+100 ⭐ Bonus", claimed: this.data.loginStreak >= 7 },
+      {
+        days: 14,
+        reward: "🎁 Free Cute Add-On",
+        claimed: this.data.loginStreak >= 14,
+      },
+      {
+        days: 30,
+        reward: "👑 VIP Status",
+        claimed: this.data.loginStreak >= 30,
+      },
+    ];
+  }
+
+  getWeeklyChallenges() {
+    const challenges = [
+      {
+        id: "visits",
+        name: "Complete 5 Spa Visits",
+        description: "Book and complete 5 spa visits this week",
+        progress: this.data.weeklyProgress.visits,
+        target: 5,
+        reward: 150,
+        icon: "🏆",
+      },
+      {
+        id: "stars",
+        name: "Earn 1000 Stars",
+        description: "Accumulate 1000 stars this week",
+        progress: this.data.weeklyProgress.starsEarned,
+        target: 1000,
+        reward: 200,
+        icon: "⭐",
+      },
+      {
+        id: "services",
+        name: "Try 6 Different Services",
+        description: "Use 6 different types of services",
+        progress: this.data.weeklyProgress.servicesUsed.size || 0,
+        target: 6,
+        reward: 175,
+        icon: "🎯",
+      },
+    ];
+
+    return challenges;
+  }
+
   // UI Updates
   updateUI() {
     this.updateStarDisplay();
     this.updateProgressRing();
     this.updateDailyCap();
+    this.updateDailyBonus();
     this.updateRewards();
     this.updateHistory();
     this.updateProfile();
     this.updateLastVisit();
+    this.updateDailyScreen();
   }
 
   updateStarDisplay() {
@@ -233,6 +405,155 @@ class SpaApp {
     lastVisit.textContent = `${date} • ${latest.services.length} services • +${latest.awardedStars} ⭐`;
   }
 
+  updateDailyBonus() {
+    const dailyBonusCard = document.getElementById("daily-bonus-card");
+    if (!dailyBonusCard) return;
+
+    if (this.data.dailyBonusClaimed) {
+      dailyBonusCard.classList.add("daily-bonus-claimed");
+      dailyBonusCard.style.display = "none"; // Hide if already claimed
+    } else {
+      dailyBonusCard.classList.remove("daily-bonus-claimed");
+      dailyBonusCard.style.display = "flex";
+    }
+  }
+
+  updateDailyScreen() {
+    this.updateDailyBonusMain();
+    this.updateStreakProgress();
+    this.updateStreakRewards();
+    this.updateWeeklyChallenges();
+  }
+
+  updateDailyBonusMain() {
+    const dailyBonusMain = document.getElementById("daily-bonus-main");
+    const dailyBonusIcon = document.getElementById("daily-bonus-icon");
+    const dailyBonusTitle = document.getElementById("daily-bonus-title");
+    const dailyBonusDesc = document.getElementById("daily-bonus-desc");
+    const dailyBonusStars = document.getElementById("daily-bonus-stars");
+    const claimBtn = document.getElementById("claim-daily-main-btn");
+
+    if (!dailyBonusMain) return;
+
+    const bonusAmount = this.getDailyBonusAmount();
+
+    if (this.data.dailyBonusClaimed) {
+      dailyBonusMain.classList.add("daily-bonus-claimed");
+      dailyBonusIcon.textContent = "✅";
+      dailyBonusTitle.textContent = "Daily Bonus Claimed";
+      dailyBonusDesc.textContent = "Come back tomorrow for another bonus!";
+      dailyBonusStars.textContent = `+${bonusAmount} ⭐`;
+      claimBtn.style.display = "none";
+    } else {
+      dailyBonusMain.classList.remove("daily-bonus-claimed");
+      dailyBonusIcon.textContent = "🎁";
+      dailyBonusTitle.textContent = "Daily Bonus Available";
+      dailyBonusDesc.textContent = `Streak bonus: +${Math.floor(
+        bonusAmount - 50
+      )} ⭐`;
+      dailyBonusStars.textContent = `+${bonusAmount} ⭐`;
+      claimBtn.style.display = "flex";
+    }
+  }
+
+  updateStreakProgress() {
+    const loginStreakDays = document.getElementById("login-streak-days");
+    const streakMultiplier = document.getElementById("streak-multiplier");
+    const streakProgressText = document.getElementById("streak-progress-text");
+    const streakProgressBar = document.getElementById("streak-progress-bar");
+
+    if (loginStreakDays)
+      loginStreakDays.textContent = `${this.data.loginStreak} days`;
+    if (streakMultiplier) {
+      const multiplier = 1 + Math.min(this.data.loginStreak * 0.1, 2.0);
+      streakMultiplier.textContent = `×${multiplier.toFixed(1)}`;
+    }
+
+    const nextMilestone = this.getStreakRewards().find(
+      (r) => r.days > this.data.loginStreak
+    );
+    const targetDays = nextMilestone ? nextMilestone.days : 30;
+    const progress = Math.min((this.data.loginStreak / targetDays) * 100, 100);
+
+    if (streakProgressText)
+      streakProgressText.textContent = `${this.data.loginStreak}/${targetDays} days`;
+    if (streakProgressBar) streakProgressBar.style.width = `${progress}%`;
+  }
+
+  updateStreakRewards() {
+    const streakRewardsList = document.getElementById("streak-rewards-list");
+    if (!streakRewardsList) return;
+
+    const rewards = this.getStreakRewards();
+    streakRewardsList.innerHTML = rewards
+      .map((reward) => {
+        const isCompleted = reward.claimed;
+        const isAvailable =
+          this.data.loginStreak >= reward.days && !isCompleted;
+
+        return `
+        <div class="streak-reward-item ${isCompleted ? "completed" : ""} ${
+          isAvailable ? "available" : ""
+        }">
+          <div>
+            <div style="font-weight: 500;">${reward.days} Days</div>
+            <div style="font-size: 0.9rem; color: var(--text-secondary);">${
+              reward.reward
+            }</div>
+          </div>
+          <div style="font-size: 1.2rem;">
+            ${isCompleted ? "✅" : isAvailable ? "🎁" : "🔒"}
+          </div>
+        </div>
+      `;
+      })
+      .join("");
+  }
+
+  updateWeeklyChallenges() {
+    const weeklyChallenges = document.getElementById("weekly-challenges");
+    if (!weeklyChallenges) return;
+
+    const challenges = this.getWeeklyChallenges();
+    weeklyChallenges.innerHTML = challenges
+      .map((challenge) => {
+        const progress = Math.min(
+          (challenge.progress / challenge.target) * 100,
+          100
+        );
+        const isCompleted = challenge.progress >= challenge.target;
+
+        return `
+        <div class="challenge-item ${isCompleted ? "completed" : ""}">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+              <span style="font-size: 1.2rem;">${challenge.icon}</span>
+              <div style="font-weight: 500;">${challenge.name}</div>
+            </div>
+            <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">
+              ${challenge.description}
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+              <span style="font-size: 0.9rem;">${challenge.progress}/${
+          challenge.target
+        }</span>
+              <span style="color: var(--accent-mint); font-weight: 600;">+${
+                challenge.reward
+              } ⭐</span>
+            </div>
+            <div class="challenge-progress">
+              <div class="challenge-progress-bar" style="width: ${progress}%;"></div>
+            </div>
+          </div>
+          <div style="margin-left: 15px;">
+            ${isCompleted ? "✅" : "⏳"}
+          </div>
+        </div>
+      `;
+      })
+      .join("");
+  }
+
   // Event Handlers
   bindEvents() {
     // Tab navigation
@@ -253,6 +574,17 @@ class SpaApp {
     const awardBtn = document.getElementById("award-stars-btn");
     if (awardBtn) {
       awardBtn.addEventListener("click", () => this.awardStars());
+    }
+
+    // Daily bonus buttons
+    const claimDailyBtn = document.getElementById("claim-daily-btn");
+    if (claimDailyBtn) {
+      claimDailyBtn.addEventListener("click", () => this.claimDailyBonus());
+    }
+
+    const claimDailyMainBtn = document.getElementById("claim-daily-main-btn");
+    if (claimDailyMainBtn) {
+      claimDailyMainBtn.addEventListener("click", () => this.claimDailyBonus());
     }
 
     // Modal close on overlay click
@@ -546,6 +878,13 @@ class SpaApp {
     this.data.totalEarned += actualAwarded;
     this.data.dailyAwarded += actualAwarded;
     this.data.lastAwardDate = today;
+
+    // Update weekly progress
+    this.data.weeklyProgress.visits += 1;
+    this.data.weeklyProgress.starsEarned += actualAwarded;
+    services.forEach((serviceId) => {
+      this.data.weeklyProgress.servicesUsed.add(serviceId);
+    });
 
     // Add visit record
     this.data.visits.push({
