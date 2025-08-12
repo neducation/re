@@ -1,0 +1,22 @@
+<!-- Simple SVG icon that can be converted to PNG -->
+<svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF4D9A;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#44FFC1;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="96" cy="96" r="92" fill="url(#bg)" />
+  
+  <!-- Star -->
+  <path d="M96 32 L108 68 L144 68 L116 88 L128 124 L96 104 L64 124 L76 88 L48 68 L84 68 Z" 
+        fill="white" stroke="none" />
+  
+  <!-- Sparkles -->
+  <circle cx="140" cy="60" r="4" fill="white" opacity="0.8" />
+  <circle cx="52" cy="140" r="3" fill="white" opacity="0.8" />
+  <circle cx="140" cy="132" r="2" fill="white" opacity="0.8" />
+  <circle cx="60" cy="52" r="2" fill="white" opacity="0.8" />
+</svg>

@@ -1,11 +1,680 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World</title>
-</head>
-<body>
-    <h1>Hello, World!</h1>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Jacky Spa Days" />
+    <meta name="theme-color" content="#0B0F14" />
+
+    <title>Jacky Spa Days</title>
+
+    <link rel="apple-touch-icon" href="./assets/icon-192.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="./assets/icon-192.png"
+    />
+    <link rel="manifest" href="./manifest.json" />
+
+    <style>
+      :root {
+        --bg-primary: #0b0f14;
+        --bg-secondary: #1a1f26;
+        --accent-pink: #ff4d9a;
+        --accent-mint: #44ffc1;
+        --text-primary: #ffffff;
+        --text-secondary: #a0a8b8;
+        --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        --border-radius: 24px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        overflow-x: hidden;
+        -webkit-user-select: none;
+        user-select: none;
+        height: 100vh;
+        position: relative;
+      }
+
+      .app-container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 90px;
+      }
+
+      .screen {
+        display: none;
+        flex: 1;
+        padding: 20px;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      .screen.active {
+        display: flex;
+        flex-direction: column;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .hero-counter {
+        text-align: center;
+        padding: 40px 20px;
+        background: linear-gradient(
+          135deg,
+          var(--bg-secondary),
+          rgba(255, 77, 154, 0.1)
+        );
+        border-radius: var(--border-radius);
+        margin-bottom: 20px;
+        box-shadow: var(--shadow);
+      }
+
+      .star-count {
+        font-size: 3.5rem;
+        font-weight: 800;
+        background: linear-gradient(
+          45deg,
+          var(--accent-pink),
+          var(--accent-mint)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .hero-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        margin-top: 10px;
+      }
+
+      .progress-ring {
+        width: 120px;
+        height: 120px;
+        margin: 20px auto;
+        position: relative;
+      }
+
+      .progress-circle {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: conic-gradient(
+          var(--accent-pink) 0deg,
+          var(--accent-pink) var(--progress-angle, 0deg),
+          var(--bg-secondary) var(--progress-angle, 0deg)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .progress-inner {
+        width: 80px;
+        height: 80px;
+        background: var(--bg-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        text-align: center;
+        color: var(--text-secondary);
+      }
+
+      .primary-button {
+        background: linear-gradient(
+          45deg,
+          var(--accent-pink),
+          var(--accent-mint)
+        );
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 18px 32px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: white;
+        margin: 20px 0;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        box-shadow: var(--shadow);
+      }
+
+      .primary-button:active {
+        transform: scale(0.95);
+      }
+
+      .shortcuts {
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+        overflow-x: auto;
+        padding-bottom: 10px;
+      }
+
+      .shortcut-chip {
+        background: var(--bg-secondary);
+        border: 2px solid transparent;
+        border-radius: 20px;
+        padding: 12px 18px;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: fit-content;
+      }
+
+      .shortcut-chip:active {
+        border-color: var(--accent-pink);
+        transform: scale(0.95);
+      }
+
+      .tab-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(26, 31, 38, 0.95);
+        backdrop-filter: blur(20px);
+        display: flex;
+        padding: 10px 0 env(safe-area-inset-bottom, 10px) 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .tab-button {
+        flex: 1;
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        padding: 10px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.8rem;
+        transition: color 0.2s ease;
+      }
+
+      .tab-button.active {
+        color: var(--accent-pink);
+      }
+
+      .tab-icon {
+        font-size: 1.5rem;
+      }
+
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        z-index: 1000;
+        align-items: flex-end;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+      }
+
+      .modal-sheet {
+        background: var(--bg-primary);
+        border-radius: 24px 24px 0 0;
+        width: 100%;
+        max-height: 80vh;
+        overflow-y: auto;
+        padding: 20px;
+        transform: translateY(100%);
+        transition: transform 0.3s ease-out;
+      }
+
+      .modal-overlay.active .modal-sheet {
+        transform: translateY(0);
+      }
+
+      .modal-header {
+        text-align: center;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .modal-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .service-list {
+        list-style: none;
+      }
+
+      .service-item {
+        background: var(--bg-secondary);
+        border-radius: 16px;
+        margin-bottom: 12px;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+      }
+
+      .service-item.selected {
+        border-color: var(--accent-pink);
+        background: rgba(255, 77, 154, 0.1);
+      }
+
+      .service-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .service-icon {
+        font-size: 1.5rem;
+      }
+
+      .service-name {
+        font-weight: 500;
+      }
+
+      .service-stars {
+        color: var(--accent-mint);
+        font-weight: 600;
+      }
+
+      .live-total {
+        position: sticky;
+        bottom: 0;
+        background: var(--bg-primary);
+        padding: 20px 0;
+        text-align: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 20px;
+      }
+
+      .total-amount {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--accent-mint);
+      }
+
+      .daily-cap-banner {
+        background: linear-gradient(45deg, #ffb800, #ff8a00);
+        color: white;
+        padding: 12px 20px;
+        text-align: center;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        font-weight: 500;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .bonus-section {
+        margin: 20px 0;
+        padding: 20px;
+        background: var(--bg-secondary);
+        border-radius: 16px;
+      }
+
+      .bonus-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: var(--accent-mint);
+      }
+
+      .bonus-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .bonus-item:last-child {
+        border-bottom: none;
+      }
+
+      .switch {
+        position: relative;
+        width: 50px;
+        height: 24px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      .switch.active {
+        background: var(--accent-pink);
+      }
+
+      .switch-thumb {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.2s ease;
+      }
+
+      .switch.active .switch-thumb {
+        transform: translateX(26px);
+      }
+
+      .photo-stepper {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .stepper-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 2px solid var(--accent-pink);
+        background: transparent;
+        color: var(--accent-pink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+
+      .stepper-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .star-burst {
+        position: fixed;
+        pointer-events: none;
+        z-index: 2000;
+      }
+
+      .star-particle {
+        position: absolute;
+        color: var(--accent-mint);
+        font-size: 1.5rem;
+        animation: burstOut 1s ease-out forwards;
+      }
+
+      @keyframes burstOut {
+        0% {
+          transform: scale(0) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1) rotate(360deg) translateY(-100px);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Home Screen -->
+      <div id="home-screen" class="screen active">
+        <div class="hero-counter">
+          <div class="star-count" id="star-count">0</div>
+          <div class="hero-subtitle">
+            You have <span id="star-text">0</span> ⭐
+          </div>
+
+          <div class="progress-ring">
+            <div class="progress-circle" id="progress-circle">
+              <div class="progress-inner" id="progress-inner">
+                <span>Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="daily-cap-banner" class="daily-cap-banner hidden">
+          ⭐ Maxed today (625). Save sparkle for tomorrow.
+        </div>
+
+        <button class="primary-button" id="start-visit-btn">
+          Start New Visit
+        </button>
+
+        <div class="shortcuts" id="shortcuts">
+          <div class="shortcut-chip" data-service="nail-session">
+            💅 Nail Session
+          </div>
+          <div class="shortcut-chip" data-service="massage">💆‍♀️ Massage</div>
+          <div class="shortcut-chip" data-service="snack-tea">🍵 Snack/Tea</div>
+        </div>
+
+        <div class="service-item" style="margin-top: 20px">
+          <div class="service-info">
+            <span class="service-icon">📊</span>
+            <div>
+              <div class="service-name">Last visit summary</div>
+              <div
+                style="font-size: 0.9rem; color: var(--text-secondary)"
+                id="last-visit"
+              >
+                No visits yet
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rewards Screen -->
+      <div id="rewards-screen" class="screen">
+        <h2 style="margin-bottom: 20px">Rewards</h2>
+        <div id="rewards-grid">
+          <!-- Rewards will be populated by JavaScript -->
+        </div>
+
+        <div
+          style="
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+          "
+        >
+          <h3 style="color: var(--accent-mint); margin-bottom: 10px">
+            Active Vouchers
+          </h3>
+          <div id="active-vouchers">No active vouchers</div>
+        </div>
+      </div>
+
+      <!-- History Screen -->
+      <div id="history-screen" class="screen">
+        <h2 style="margin-bottom: 20px">Visit History</h2>
+        <div id="history-list">
+          <!-- History will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Profile Screen -->
+      <div id="profile-screen" class="screen">
+        <h2 style="margin-bottom: 20px">Profile</h2>
+
+        <div class="service-item">
+          <div class="service-info">
+            <span class="service-icon">⭐</span>
+            <div>
+              <div class="service-name">Total Stars Earned</div>
+              <div style="color: var(--text-secondary)" id="total-earned">
+                0 ⭐
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-item">
+          <div class="service-info">
+            <span class="service-icon">🏆</span>
+            <div>
+              <div class="service-name">Total Visits</div>
+              <div style="color: var(--text-secondary)" id="total-visits">
+                0
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="service-item">
+          <div class="service-info">
+            <span class="service-icon">🔥</span>
+            <div>
+              <div class="service-name">Current Streak</div>
+              <div style="color: var(--text-secondary)" id="current-streak">
+                0 weeks
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button
+          class="primary-button"
+          id="settings-btn"
+          style="margin-top: 20px"
+        >
+          Settings
+        </button>
+      </div>
+
+      <!-- Tab Bar -->
+      <div class="tab-bar">
+        <button class="tab-button active" data-screen="home">
+          <div class="tab-icon">🏠</div>
+          <div>Home</div>
+        </button>
+        <button class="tab-button" data-screen="rewards">
+          <div class="tab-icon">🎁</div>
+          <div>Rewards</div>
+        </button>
+        <button class="tab-button" data-screen="history">
+          <div class="tab-icon">📋</div>
+          <div>History</div>
+        </button>
+        <button class="tab-button" data-screen="profile">
+          <div class="tab-icon">👤</div>
+          <div>Profile</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Start Visit Modal -->
+    <div id="start-visit-modal" class="modal-overlay">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3 class="modal-title">Tonight's Spa Visit</h3>
+          <div
+            style="color: var(--text-secondary); font-size: 0.9rem"
+            id="visit-date"
+          ></div>
+        </div>
+
+        <ul class="service-list" id="service-list">
+          <!-- Services will be populated by JavaScript -->
+        </ul>
+
+        <div class="bonus-section">
+          <div class="bonus-title">Bonuses</div>
+
+          <div class="bonus-item">
+            <span>Theme Night</span>
+            <div class="switch" id="theme-switch">
+              <div class="switch-thumb"></div>
+            </div>
+          </div>
+
+          <div class="bonus-item">
+            <span>Aesthetic Match (+50⭐)</span>
+            <div class="switch" id="aesthetic-switch">
+              <div class="switch-thumb"></div>
+            </div>
+          </div>
+
+          <div class="bonus-item">
+            <span>Perfect Prep (+75⭐)</span>
+            <div class="switch" id="perfect-prep-switch">
+              <div class="switch-thumb"></div>
+            </div>
+          </div>
+
+          <div class="bonus-item">
+            <span>Photos</span>
+            <div class="photo-stepper">
+              <button class="stepper-btn" id="photo-minus">−</button>
+              <span id="photo-count">0</span>
+              <button class="stepper-btn" id="photo-plus">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="live-total">
+          <div style="color: var(--text-secondary); font-size: 0.9rem">
+            Projected Stars
+          </div>
+          <div class="total-amount" id="live-total">0 ⭐</div>
+          <button class="primary-button" id="award-stars-btn">
+            Award Stars
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="spa-app.js"></script>
+  </body>
 </html>
